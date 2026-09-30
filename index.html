@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>🥊 رینگ اتم‌ها | نبرد واکنش‌پذیری</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#e8b73a;
+  --red:#e5484d;
+  --green:#22c55e;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:'Vazirmatn',Tahoma,sans-serif;
+  background:radial-gradient(circle at 50% -10%, #23234a 0%, #0b0b16 55%, #05050c 100%);
+  color:#eceaf5;
+  min-height:100vh;
+  display:flex;justify-content:center;
+  padding:10px;
+  user-select:none;
+  -webkit-tap-highlight-color:transparent;
+  overflow-x:hidden;
+}
+
+.app{
+  width:min(1000px,100%);
+  display:flex;flex-direction:column;gap:8px;
+}
+
+/* ---------- HEADER ---------- */
+header{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:8px 14px;
+  background:linear-gradient(180deg,#1c1c34,#12121f);
+  border:2px solid #2e2e52;
+  border-radius:14px;
+  box-shadow:0 6px 20px rgba(0,0,0,.5);
+  flex-wrap:wrap;
+}
+.title-wrap{display:flex;flex-direction:column;gap:2px}
+.title{
+  font-weight:900;font-size:clamp(15px,3.2vw,22px);
+  color:var(--gold);
+  text-shadow:0 0 14px rgba(232,183,58,.45);
+  white-space:nowrap;
+}
+.creator{
+  font-size:10.5px;color:#7d7da8;font-weight:600;
+  letter-spacing:.4px;
+}
+.creator b{color:#b9b8d4}
+.score{display:flex;gap:8px;font-size:clamp(12px,2.6vw,15px);font-weight:700}
+.score span{
+  padding:5px 12px;border-radius:10px;display:flex;align-items:center;gap:6px;
+  background:#0e0e1c;border:1px solid #33335c;
+}
+.score b{font-size:1.35em;font-weight:900}
+.s-white{color:#ffe0b8;border-color:#6b5230 !important}
+.s-black{color:#a9c8ff;border-color:#2c3f6b !important}
+
+/* ---------- STATUS ---------- */
+.status{
+  text-align:center;font-weight:700;
+  font-size:clamp(12px,2.7vw,16px);
+  padding:9px 12px;border-radius:12px;
+  background:#12122a;border:1px solid #2b2b50;
+  min-height:42px;display:flex;align-items:center;justify-content:center;
+  transition:.25s;
+}
+.status.win{background:#0e2a18;border-color:#1f7a42;color:#8df3b4;box-shadow:0 0 18px rgba(34,197,94,.25)}
+.status.lose{background:#2c0f14;border-color:#8a2733;color:#ff9aa5;box-shadow:0 0 18px rgba(229,72,77,.25)}
+.status.draw{background:#2a2410;border-color:#7a6420;color:#f3d98a}
+
+/* ---------- BENCH ---------- */
+.bench{
+  display:flex;gap:6px;justify-content:center;flex-wrap:wrap;
+  padding:7px;border-radius:14px;
+  background:linear-gradient(180deg,#141426,#0e0e1c);
+  border:2px solid #262647;
+  min-height:86px;align-items:center;
+}
+.bench.enemy{border-color:#3a2a4a;background:linear-gradient(180deg,#1a1226,#0f0a18)}
+
+.card{
+  width:76px;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:6px 3px 5px;
+  background:linear-gradient(180deg,#232342,#171729);
+  border:2px solid #35355f;
+  border-radius:12px;
+  cursor:pointer;
+  transition:transform .14s, box-shadow .18s, border-color .18s, opacity .25s;
+  font-family:inherit;color:inherit;
+}
+.card:hover:not(:disabled){
+  transform:translateY(-5px);
+  border-color:var(--gold);
+  box-shadow:0 8px 20px rgba(232,183,58,.3);
+}
+.card:active:not(:disabled){transform:translateY(-1px) scale(.97)}
+.card:disabled{cursor:not-allowed}
+.card.used{opacity:.2;filter:grayscale(1);transform:none!important;box-shadow:none!important}
+
+.ball{
+  width:var(--s);height:var(--s);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:900;
+  font-size:calc(var(--s) * .42);
+  font-family:monospace;
+  background:radial-gradient(circle at 32% 28%, #ffffff 0%, #cfd4e6 35%, #8f96b5 75%, #5c6280 100%);
+  color:#20233a;
+  border:2px solid #ffffff55;
+  box-shadow:inset -3px -4px 8px rgba(0,0,0,.35), 0 3px 8px rgba(0,0,0,.5);
+  flex-shrink:0;
+}
+.card .nm{font-size:10.5px;font-weight:700;color:#b9b8d4;line-height:1}
+
+.card.back{
+  width:52px;height:68px;
+  justify-content:center;
+  background:
+    repeating-linear-gradient(45deg,#2a1030,#2a1030 7px,#1d0a22 7px,#1d0a22 14px);
+  border-color:#5b2b6b;
+  font-size:22px;font-weight:900;color:#a05cc0;
+  cursor:default;
+}
+.card.back.used{opacity:.12}
+
+/* ---------- RING ---------- */
+.ring{
+  position:relative;
+  height:min(56vh,420px);
+  min-height:300px;
+  border-radius:18px;
+  overflow:hidden;
+  background:
+    radial-gradient(ellipse at 50% 110%, #3a3a5d 0%, #1a1a30 45%, #08080f 100%);
+  border:5px solid #6b4f14;
+  box-shadow:
+    0 0 0 3px #241a06,
+    0 0 0 6px #0e0a02,
+    0 18px 50px rgba(0,0,0,.8),
+    0 0 80px rgba(232,183,58,.12),
+    inset 0 0 100px rgba(0,0,0,.9);
+}
+.ring.shake{animation:shake .36s}
+@keyframes shake{
+  0%,100%{transform:translate(0,0)}
+  15%{transform:translate(-11px,6px)}
+  30%{transform:translate(10px,-5px)}
+  45%{transform:translate(-8px,-6px)}
+  60%{transform:translate(7px,5px)}
+  80%{transform:translate(-3px,2px)}
+}
+
+.crowd{
+  position:absolute;top:0;left:0;right:0;height:40%;
+  background:#08080f;
+  overflow:hidden;
+}
+.crowd::before{
+  content:'';position:absolute;inset:0;
+  background-image:
+    radial-gradient(circle, rgba(120,120,180,.5) 2px, transparent 2.5px),
+    radial-gradient(circle, rgba(80,80,140,.55) 2.5px, transparent 3px),
+    radial-gradient(circle, rgba(140,100,180,.4) 2px, transparent 2.5px);
+  background-size:22px 18px, 28px 24px, 34px 30px;
+  background-position:0 0, 12px 10px, 20px 6px;
+  mask-image:linear-gradient(180deg, rgba(0,0,0,.95) 25%, transparent 100%);
+  -webkit-mask-image:linear-gradient(180deg, rgba(0,0,0,.95) 25%, transparent 100%);
+}
+
+.lights{
+  position:absolute;top:0;left:0;right:0;height:65%;
+  pointer-events:none;z-index:1;
+  background:
+    radial-gradient(ellipse 240px 130px at 18% -5%, rgba(255,225,150,.35), transparent 70%),
+    radial-gradient(ellipse 240px 130px at 50% -5%, rgba(255,235,180,.45), transparent 70%),
+    radial-gradient(ellipse 240px 130px at 82% -5%, rgba(255,225,150,.35), transparent 70%);
+}
+.lights::after{
+  content:'';position:absolute;inset:0;
+  background:
+    conic-gradient(from 200deg at 18% 0%, transparent 0deg, rgba(255,220,150,.07) 20deg, transparent 40deg),
+    conic-gradient(from 150deg at 50% 0%, transparent 0deg, rgba(255,220,150,.09) 20deg, transparent 40deg),
+    conic-gradient(from 100deg at 82% 0%, transparent 0deg, rgba(255,220,150,.07) 20deg, transparent 40deg);
+  animation:lightPulse 4s ease-in-out infinite;
+}
+@keyframes lightPulse{
+  0%,100%{opacity:.8}
+  50%{opacity:1}
+}
+
+.post{
+  position:absolute;width:12px;top:32%;bottom:28%;
+  background:linear-gradient(90deg,#8a6612,#f0d060 40%,#e8b73a 60%,#8a6612);
+  border-radius:4px;
+  box-shadow:inset 0 0 8px rgba(0,0,0,.6), 0 0 12px rgba(232,183,58,.4);
+  z-index:2;
+}
+.post.pl{left:2.5%}
+.post.pr{right:2.5%}
+.post::before{
+  content:'';position:absolute;top:-8px;left:50%;transform:translateX(-50%);
+  width:22px;height:14px;border-radius:4px;
+  background:linear-gradient(180deg,#e5484d,#8a1f26);
+  box-shadow:0 2px 6px rgba(0,0,0,.6);
+}
+
+.ropes{
+  position:absolute;left:0;right:0;top:20%;height:46%;
+  pointer-events:none;z-index:1;
+  background:
+    linear-gradient(#c0392b,#c0392b) top/100% 5px no-repeat,
+    linear-gradient(#c0392b,#c0392b) center/100% 5px no-repeat,
+    linear-gradient(#c0392b,#c0392b) bottom/100% 5px no-repeat;
+  opacity:.8;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,.7)) drop-shadow(0 0 4px rgba(229,72,77,.4));
+}
+
+.floor{
+  position:absolute;left:0;right:0;bottom:0;height:32%;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(255,220,150,.25), transparent 60%),
+    linear-gradient(180deg, #4a3a1a 0%, #2e2410 40%, #1a1408 100%);
+  border-top:4px solid var(--gold);
+  box-shadow:0 -8px 30px rgba(232,183,58,.3);
+  z-index:0;
+}
+.floor::before{
+  content:'';position:absolute;inset:0;
+  background-image:
+    repeating-linear-gradient(90deg, rgba(0,0,0,.15) 0 3px, transparent 3px 40px),
+    repeating-linear-gradient(0deg, rgba(0,0,0,.1) 0 2px, transparent 2px 30px);
+  opacity:.5;
+}
+.floor::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,.6));
+}
+
+.vs{
+  position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);
+  font-size:clamp(22px,5vw,38px);font-weight:900;
+  color:transparent;
+  -webkit-text-stroke:2px rgba(232,183,58,.35);
+  letter-spacing:4px;
+  pointer-events:none;z-index:1;
+  animation:vsPulse 3s ease-in-out infinite;
+}
+@keyframes vsPulse{
+  0%,100%{opacity:.5;-webkit-text-stroke:2px rgba(232,183,58,.3)}
+  50%{opacity:.9;-webkit-text-stroke:2px rgba(232,183,58,.6)}
+}
+
+.slot{
+  position:absolute;bottom:22px;z-index:3;
+  display:flex;align-items:flex-end;justify-content:center;
+}
+#playerSlot{left:5%}
+#enemySlot{right:5%}
+
+.fighter{
+  transform-origin:center center;
+  will-change:transform,opacity;
+  filter:drop-shadow(0 14px 16px rgba(0,0,0,.75));
+  position:relative;
+}
+
+.flash{
+  position:absolute;left:50%;top:42%;
+  width:0;height:0;border-radius:50%;
+  transform:translate(-50%,-50%);
+  background:radial-gradient(circle,#ffffff 0%,#ffe27a 30%,#ff9a3a 55%,rgba(255,120,0,0) 75%);
+  opacity:0;pointer-events:none;z-index:4;
+}
+.flash.go{animation:flashOut .55s ease-out}
+@keyframes flashOut{
+  0%{width:10px;height:10px;opacity:1}
+  100%{width:440px;height:440px;opacity:0}
+}
+
+/* ---------- HINT ---------- */
+.hintbox{
+  border-radius:14px;border:1px solid #2b2b50;background:#101020;
+  overflow:hidden;
+}
+.hintbox button{
+  width:100%;padding:10px;font-family:inherit;font-weight:700;font-size:13.5px;
+  background:transparent;border:0;color:#9d9dc8;cursor:pointer;
+  transition:.2s;
+}
+.hintbox button:hover{background:#181830;color:var(--gold)}
+.hintbody{
+  max-height:0;overflow:hidden;transition:max-height .35s ease;
+  border-top:0 solid #2b2b50;
+}
+.hintbody.open{max-height:220px;border-top-width:1px}
+.chain{
+  direction:ltr;
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:center;
+  gap:5px;padding:12px;
+}
+.chip{
+  padding:6px 11px;border-radius:9px;font-family:monospace;font-weight:900;
+  font-size:14px;background:#232342;border:2px solid #3c3c6b;color:#cfd4e6;
+}
+.chip.strong{background:linear-gradient(180deg,#7a1e26,#4a0f16);border-color:#e5484d;color:#ffc9cf;box-shadow:0 0 12px rgba(229,72,77,.4)}
+.chip.mid{background:linear-gradient(180deg,#5c4a12,#332806);border-color:#e8b73a;color:#ffe9a8}
+.chip.weak{background:linear-gradient(180deg,#1c3a5c,#0d1e33);border-color:#4a86d4;color:#bcd9ff}
+.arrow{color:#565686;font-weight:900;font-size:15px}
+.hintnote{
+  text-align:center;font-size:11.5px;color:#7d7da8;padding:0 12px 11px;
+  line-height:1.7;
+}
+
+/* ---------- OVERLAY ---------- */
+.overlay{
+  position:fixed;inset:0;z-index:100;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(5,5,14,.88);
+  backdrop-filter:blur(8px);
+  opacity:0;pointer-events:none;transition:opacity .3s;
+  padding:16px;
+}
+.overlay.show{opacity:1;pointer-events:auto}
+.modal{
+  width:min(560px,100%);
+  max-height:92vh;overflow-y:auto;
+  background:linear-gradient(180deg,#1c1c34,#101020);
+  border:2px solid #35355f;border-radius:22px;
+  padding:28px 24px;text-align:center;
+  box-shadow:0 26px 80px rgba(0,0,0,.9), 0 0 0 1px rgba(232,183,58,.15), 0 0 60px rgba(232,183,58,.08);
+  animation:pop .4s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes pop{from{transform:scale(.88);opacity:0}to{transform:scale(1);opacity:1}}
+.modal .big{font-size:56px;line-height:1;margin-bottom:10px;filter:drop-shadow(0 4px 12px rgba(232,183,58,.4))}
+.modal h1{
+  font-size:clamp(20px,5vw,28px);color:var(--gold);
+  margin-bottom:14px;text-shadow:0 0 20px rgba(232,183,58,.4);
+}
+.modal p{
+  font-size:13.5px;line-height:2;color:#b6b6d4;margin-bottom:8px;text-align:right;
+}
+.modal p.center{text-align:center}
+.modal ul{
+  text-align:right;font-size:13px;line-height:2.05;color:#b6b6d4;
+  margin:12px 18px 14px;padding-right:4px;
+}
+.modal li{margin-bottom:3px}
+.modal li b{color:#ffe0b8}
+.modal .creator-line{
+  margin-top:18px;font-size:12px;color:#6d6d98;
+  border-top:1px dashed #2b2b50;padding-top:12px;
+}
+.modal .creator-line b{color:var(--gold);font-weight:700}
+.modal button{
+  margin-top:18px;
+  padding:14px 46px;border-radius:14px;border:0;
+  font-family:inherit;font-weight:900;font-size:16px;
+  background:linear-gradient(180deg,#f0c94a,#c9962a);
+  color:#231a02;cursor:pointer;
+  box-shadow:0 6px 0 #8a6612, 0 10px 30px rgba(232,183,58,.45);
+  transition:.12s;
+}
+.modal button:hover{filter:brightness(1.08)}
+.modal button:active{transform:translateY(4px);box-shadow:0 2px 0 #8a6612}
+
+.final-score{
+  display:flex;gap:14px;justify-content:center;margin-top:18px;
+}
+.final-score > div{
+  flex:1;padding:14px;border-radius:14px;
+  background:#0e0e1c;border:1px solid #2e2e52;
+  display:flex;flex-direction:column;gap:5px;
+}
+.final-score span{font-size:12px;color:#8b8bb0}
+.final-score b{font-size:32px;font-weight:900;color:var(--gold)}
+
+@media(max-width:600px){
+  .card{width:64px}
+  .card.back{width:44px;height:58px;font-size:18px}
+  #playerSlot{left:2%}
+  #enemySlot{right:2%}
+  .bench{gap:4px;padding:5px}
+  .ring{min-height:270px}
+  .creator{font-size:9.5px}
+  .title{font-size:14px}
+  .modal{padding:22px 16px}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header>
+    <div class="title-wrap">
+      <div class="title">🥊 رینگ اتم‌ها</div>
+      <div class="creator">ساخته شده توسط <b>مهندس رحمانی</b></div>
+    </div>
+    <div class="score">
+      <span class="s-white">ما <b id="scorePlayer">0</b></span>
+      <span class="s-black">حریف <b id="scoreEnemy">0</b></span>
+    </div>
+  </header>
+
+  <div class="status" id="status">آماده‌ای مربی؟</div>
+
+  <div class="bench enemy" id="enemyBench"></div>
+
+  <div class="ring" id="ring">
+    <div class="crowd"></div>
+    <div class="lights"></div>
+    <div class="post pl"></div>
+    <div class="post pr"></div>
+    <div class="ropes"></div>
+    <div class="floor"></div>
+    <div class="vs">VS</div>
+    <div class="slot" id="playerSlot"></div>
+    <div class="slot" id="enemySlot"></div>
+    <div class="flash" id="flash"></div>
+  </div>
+
+  <div class="bench player" id="playerBench"></div>
+
+  <div class="hintbox">
+    <button id="hintBtn">📚 راهنمای ترتیب واکنش‌پذیری (باز / بسته)</button>
+    <div class="hintbody" id="hintBody">
+      <div class="chain">
+        <span class="chip strong">Na</span><span class="arrow">&gt;</span>
+        <span class="chip strong">Li</span><span class="arrow">&gt;</span>
+        <span class="chip mid">Mg</span><span class="arrow">&gt;</span>
+        <span class="chip mid">Zn</span><span class="arrow">&gt;</span>
+        <span class="chip mid">Fe</span><span class="arrow">&gt;</span>
+        <span class="chip weak">Cu</span><span class="arrow">&gt;</span>
+        <span class="chip weak">Au</span>
+      </div>
+      <div class="hintnote">از چپ به راست واکنش‌پذیری کم می‌شود. هر اتمی که سمت چپ‌تر باشد، در مبارزه برنده است.</div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay show" id="overlay">
+  <div class="modal" id="startModal">
+    <div class="big">🥊</div>
+    <h1>رینگ اتم‌ها</h1>
+    <p class="center">تو مربی تیم اتم‌های <b>لباس سفید</b> هستی.<br>حریف، همان اتم‌ها را با <b>لباس مشکی</b> به میدان می‌فرستد.</p>
+    <ul>
+      <li>🔹 در هر راند، حریف یک اتم را وارد رینگ می‌کند.</li>
+      <li>🔹 تو باید از بین اتم‌های <b>باقی‌مانده‌ات</b> یکی را انتخاب کنی.</li>
+      <li>🔹 اگر <b>واکنش‌پذیری</b> اتم تو بیشتر باشد، با یک ضربهٔ پروازی حریف را زمین می‌زنی. ✅</li>
+      <li>🔹 اگر کمتر باشد، اتم تو با ضربهٔ حریف زمین می‌خورد. ❌</li>
+      <li>🔹 هر اتم فقط <b>یک بار</b> می‌تواند مبارزه کند — پس هوشمندانه خرجش کن!</li>
+      <li>🔹 <b>یادت باشد:</b> سدیم (Na) از لیتیم (Li) واکنش‌پذیرتر است!</li>
+    </ul>
+    <div class="creator-line">ساخته شده توسط <b>مهندس رحمانی</b></div>
+    <button id="startBtn">شروع مبارزه</button>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   داده‌های عناصر  —  ترتیب واکنش‌پذیری: Na > Li > Mg > Zn > Fe > Cu > Au
+   ============================================================ */
+const ELEMENTS = {
+  Na: { fa: 'سدیم',   r: 186, skin: '#d8a878', hair: '#20180e', style: 'buzz'   },
+  Li: { fa: 'لیتیم',  r: 152, skin: '#e8b888', hair: '#3a2210', style: 'spike'  },
+  Mg: { fa: 'منیزیم', r: 160, skin: '#e0ac7a', hair: '#4a2c14', style: 'short'  },
+  Zn: { fa: 'روی',    r: 134, skin: '#e8b888', hair: '#5a3a1a', style: 'mohawk' },
+  Fe: { fa: 'آهن',    r: 126, skin: '#d49c68', hair: '#2a1808', style: 'buzz'   },
+  Cu: { fa: 'مس',     r: 128, skin: '#e0a070', hair: '#6a3a10', style: 'spike'  },
+  Au: { fa: 'طلا',    r: 144, skin: '#f0c890', hair: '#c89828', style: 'long'   },
+};
+
+/* ترتیب واکنش‌پذیری از زیاد به کم */
+const ORDER = ['Na','Li','Mg','Zn','Fe','Cu','Au'];
+
+/* قدرت مبارزه: Na=7 ... Au=1 */
+const POWER = {};
+ORDER.forEach((k, i) => POWER[k] = ORDER.length - i);
+
+/* مقیاس جثه — بر اساس واکنش‌پذیری */
+const SCALE = {
+  Na: 1.00, Li: 0.93, Mg: 0.83, Zn: 0.73, Fe: 0.70, Cu: 0.68, Au: 0.66,
+};
+
+const $ = id => document.getElementById(id);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const raf = () => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+function shuffle(a){
+  for (let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function ballSize(r){ return Math.round(34 + (r - 126) * (22 / 60)); }
+
+/* ============================================================
+   موی سر بر اساس سبک هر عنصر
+   ============================================================ */
+function hairShape(style, hair, hairLight){
+  if (style === 'buzz'){
+    return `
+      <path d="M 33 32 Q 30 6 60 5 Q 90 6 87 32 Q 84 17 60 15 Q 36 17 33 32 Z" fill="${hair}"/>
+      <path d="M 38 22 Q 46 13 60 12" fill="none" stroke="${hairLight}" stroke-width="1.4" opacity="0.55"/>`;
+  }
+  if (style === 'spike'){
+    return `
+      <path d="M 31 34 Q 27 2 60 2 Q 93 2 89 34
+               L 84 16 L 80 26 L 76 12 L 71 24 L 66 8 L 62 22 L 58 6 L 53 21 L 48 10 L 44 24 L 39 14 L 36 26 Z"
+        fill="${hair}"/>
+      <path d="M 40 14 Q 50 6 60 6" fill="none" stroke="${hairLight}" stroke-width="1.4" opacity="0.6"/>`;
+  }
+  if (style === 'mohawk'){
+    return `
+      <path d="M 33 32 Q 30 8 60 7 Q 90 8 87 32 Q 84 18 60 16 Q 36 18 33 32 Z" fill="${hair}" opacity="0.5"/>
+      <path d="M 52 24 Q 50 0 60 0 Q 70 0 68 24 L 66 14 L 60 6 L 54 14 Z" fill="${hair}"/>
+      <path d="M 57 8 Q 60 3 63 8" fill="none" stroke="${hairLight}" stroke-width="1.2" opacity="0.7"/>`;
+  }
+  if (style === 'long'){
+    return `
+      <path d="M 31 36 Q 26 0 60 0 Q 94 0 89 36 L 92 58 Q 86 52 84 34 Q 82 12 60 10 Q 38 12 36 34 Q 34 52 28 58 Z"
+        fill="${hair}"/>
+      <path d="M 36 30 Q 44 14 60 12" fill="none" stroke="${hairLight}" stroke-width="1.5" opacity="0.65"/>
+      <path d="M 84 30 Q 76 14 60 12" fill="none" stroke="${hairLight}" stroke-width="1.2" opacity="0.4"/>`;
+  }
+  /* short (default) */
+  return `
+    <path d="M 32 34 Q 28 4 60 3 Q 92 4 88 34 Q 85 16 60 13 Q 35 16 32 34 Z" fill="${hair}"/>
+    <path d="M 38 22 Q 47 11 60 10 Q 48 14 38 22 Z" fill="${hairLight}" opacity="0.65"/>
+    <path d="M 82 22 Q 73 11 60 10 Q 72 14 82 22 Z" fill="${hairLight}" opacity="0.45"/>`;
+}
+
+/* ============================================================
+   ساخت فیگور مبارز (SVG) — فوق‌پر جزئیات
+   ============================================================ */
+function fighterSVG(key, side){
+  const sc = SCALE[key] || 0.8;
+  const h = Math.round(190 * sc);
+  const w = Math.round(h * (130 / 240));
+
+  const isBlack = side === 'enemy';
+  const e = ELEMENTS[key] || { skin: '#e8b888', hair: '#3a2210', style: 'short' };
+
+  const skin      = e.skin;
+  const skinShade = 'rgba(90,50,20,0.5)';
+  const skinLine  = 'rgba(60,30,10,0.65)';
+  const skinLight = 'rgba(255,230,200,0.35)';
+
+  const outfit      = isBlack ? '#15151f' : '#f5f5fa';
+  const outfitShade = isBlack ? '#05050a' : '#a0a0b8';
+  const outfitLight = isBlack ? 'rgba(80,80,120,0.35)' : 'rgba(255,255,255,0.9)';
+  const trim        = isBlack ? '#e5484d' : '#3a7bd5';
+  const trimLight   = isBlack ? '#ff8a8e' : '#7fb0ff';
+  const glove       = isBlack ? '#15151f' : '#f5f5fa';
+  const gloveShade  = isBlack ? '#05050a' : '#a0a0b8';
+  const boots       = isBlack ? '#0d0d14' : '#e8e8f0';
+  const bootsShade  = isBlack ? '#000000' : '#8a8aa0';
+  const textColor   = isBlack ? '#ffddaa' : '#3a5a9a';
+  const tattooColor = isBlack ? 'rgba(120,60,90,0.7)' : 'rgba(60,80,140,0.55)';
+
+  return `
+  <svg viewBox="0 0 130 240" width="${w}" height="${h}" style="display:block">
+    <defs>
+      <radialGradient id="glow-${key}-${side}" cx="50%" cy="20%" r="70%">
+        <stop offset="0%" stop-color="rgba(255,230,180,0.14)"/>
+        <stop offset="100%" stop-color="rgba(255,230,180,0)"/>
+      </radialGradient>
+      <linearGradient id="abs-${key}-${side}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="${skin}" stop-opacity="0.1"/>
+        <stop offset="100%" stop-color="${skinShade}" stop-opacity="0.6"/>
+      </linearGradient>
+    </defs>
+
+    <!-- سایه روی زمین -->
+    <ellipse cx="65" cy="233" rx="42" ry="6" fill="rgba(0,0,0,0.6)"/>
+
+    <!-- ══════ پاها ══════ -->
+    <path d="M 46 158 Q 44 190 44 210 L 62 210 Q 63 190 62 158 Z"
+      fill="${skin}" stroke="${skinLine}" stroke-width="1.6"/>
+    <path d="M 68 158 Q 68 190 70 210 L 88 210 Q 86 190 84 158 Z"
+      fill="${skin}" stroke="${skinLine}" stroke-width="1.6"/>
+    <!-- عضله ساق -->
+    <path d="M 49 172 Q 53 168 57 172" fill="none" stroke="${skinShade}" stroke-width="1.3" opacity="0.6"/>
+    <path d="M 73 172 Q 77 168 82 172" fill="none" stroke="${skinShade}" stroke-width="1.3" opacity="0.6"/>
+    <!-- نوار ساق (Ankle wrap) -->
+    <rect x="43" y="204" width="20" height="6" rx="2" fill="${trim}" opacity="0.9"/>
+    <rect x="68" y="204" width="20" height="6" rx="2" fill="${trim}" opacity="0.9"/>
+    <line x1="44" y1="207" x2="62" y2="207" stroke="${trimLight}" stroke-width="0.8" opacity="0.6"/>
+    <line x1="69" y1="207" x2="87" y2="207" stroke="${trimLight}" stroke-width="0.8" opacity="0.6"/>
+
+    <!-- ══════ پوتین‌ها ══════ -->
+    <path d="M 41 210 L 64 210 L 64 224 Q 64 231 56 231 L 43 231 Q 36 231 36 224 Z"
+      fill="${boots}" stroke="${bootsShade}" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M 66 210 L 89 210 L 94 224 Q 94 231 87 231 L 74 231 Q 66 231 66 224 Z"
+      fill="${boots}" stroke="${bootsShade}" stroke-width="2" stroke-linejoin="round"/>
+    <!-- براقی پوتین -->
+    <ellipse cx="48" cy="218" rx="6" ry="4" fill="${outfitLight}" opacity="0.35"/>
+    <ellipse cx="73" cy="218" rx="6" ry="4" fill="${outfitLight}" opacity="0.35"/>
+    <!-- بند پوتین -->
+    <line x1="42" y1="215" x2="62" y2="215" stroke="${bootsShade}" stroke-width="1.2"/>
+    <line x1="42" y1="220" x2="62" y2="220" stroke="${bootsShade}" stroke-width="1.2"/>
+    <line x1="42" y1="225" x2="62" y2="225" stroke="${bootsShade}" stroke-width="1.2"/>
+    <line x1="68" y1="215" x2="88" y2="215" stroke="${bootsShade}" stroke-width="1.2"/>
+    <line x1="68" y1="220" x2="88" y2="220" stroke="${bootsShade}" stroke-width="1.2"/>
+    <line x1="68" y1="225" x2="88" y2="225" stroke="${bootsShade}" stroke-width="1.2"/>
+    <!-- لوگوی روی پوتین -->
+    <circle cx="52" cy="220" r="3" fill="${trim}" opacity="0.8"/>
+    <circle cx="78" cy="220" r="3" fill="${trim}" opacity="0.8"/>
+
+    <!-- ══════ شورت ══════ -->
+    <path d="M 30 118 Q 26 152 34 160 L 50 160 L 56 133 L 74 133 L 80 160 L 96 160 Q 104 152 100 118 Z"
+      fill="${outfit}" stroke="${outfitShade}" stroke-width="2.5" stroke-linejoin="round"/>
+    <!-- چین‌های شورت -->
+    <path d="M 42 128 Q 44 142 43 156" fill="none" stroke="${outfitShade}" stroke-width="1.2" opacity="0.45"/>
+    <path d="M 88 128 Q 86 142 87 156" fill="none" stroke="${outfitShade}" stroke-width="1.2" opacity="0.45"/>
+    <path d="M 60 132 L 60 158" stroke="${outfitShade}" stroke-width="1.2" opacity="0.35"/>
+    <!-- نوار کناری شورت -->
+    <path d="M 32 120 Q 30 140 35 156" fill="none" stroke="${trim}" stroke-width="3" opacity="0.9" stroke-linecap="round"/>
+    <path d="M 98 120 Q 100 140 95 156" fill="none" stroke="${trim}" stroke-width="3" opacity="0.9" stroke-linecap="round"/>
+    <!-- نشان تیم روی شورت -->
+    <circle cx="65" cy="146" r="9" fill="${trim}" stroke="${outfitShade}" stroke-width="1.5"/>
+    <text x="65" y="151" text-anchor="middle" font-size="11" font-weight="900"
+      fill="${isBlack ? '#fff' : '#fff'}" font-family="monospace">${isBlack ? '★' : '⚡'}</text>
+
+    <!-- ══════ کمربند ══════ -->
+    <rect x="27" y="110" width="76" height="14" rx="3" fill="${trim}" stroke="${outfitShade}" stroke-width="2"/>
+    <rect x="27" y="112" width="76" height="3" fill="${trimLight}" opacity="0.5"/>
+    <rect x="55" y="108" width="20" height="18" rx="3" fill="#ffd166" stroke="#8a6612" stroke-width="1.5"/>
+    <circle cx="65" cy="117" r="3.5" fill="#8a6612"/>
+    <circle cx="65" cy="117" r="1.2" fill="#fff5c8"/>
+
+    <!-- ══════ تنه ══════ -->
+    <path d="M 30 62 Q 18 92 30 120 L 100 120 Q 112 92 100 62 Z"
+      fill="${skin}" stroke="${skinLine}" stroke-width="2.5" stroke-linejoin="round"/>
+
+    <!-- عضلات سینه -->
+    <path d="M 33 82 Q 48 72 58 86 Q 60 92 58 96 L 33 96 Z"
+      fill="${skinLight}" opacity="0.35"/>
+    <path d="M 97 82 Q 82 72 72 86 Q 70 92 72 96 L 97 96 Z"
+      fill="${skinLight}" opacity="0.35"/>
+    <path d="M 34 96 Q 46 88 58 96" fill="none" stroke="${skinLine}" stroke-width="1.8" opacity="0.75" stroke-linecap="round"/>
+    <path d="M 96 96 Q 84 88 72 96" fill="none" stroke="${skinLine}" stroke-width="1.8" opacity="0.75" stroke-linecap="round"/>
+    <line x1="65" y1="86" x2="65" y2="96" stroke="${skinLine}" stroke-width="1.4" opacity="0.6"/>
+
+    <!-- عضلات شکم (۶ تکه) -->
+    <rect x="52" y="100" width="11" height="8" rx="1.5" fill="url(#abs-${key}-${side})"/>
+    <rect x="67" y="100" width="11" height="8" rx="1.5" fill="url(#abs-${key}-${side})"/>
+    <rect x="52" y="110" width="11" height="8" rx="1.5" fill="url(#abs-${key}-${side})"/>
+    <rect x="67" y="110" width="11" height="8" rx="1.5" fill="url(#abs-${key}-${side})"/>
+    <line x1="65" y1="98" x2="65" y2="119" stroke="${skinLine}" stroke-width="1.2" opacity="0.5"/>
+    <line x1="50" y1="109" x2="80" y2="109" stroke="${skinLine}" stroke-width="1.1" opacity="0.45"/>
+    <line x1="50" y1="119" x2="80" y2="119" stroke="${skinLine}" stroke-width="1.1" opacity="0.4"/>
+
+    <!-- عضلات پهلو (Obliques) -->
+    <path d="M 33 100 Q 36 110 34 120" fill="none" stroke="${skinLine}" stroke-width="1.3" opacity="0.55"/>
+    <path d="M 97 100 Q 94 110 96 120" fill="none" stroke="${skinLine}" stroke-width="1.3" opacity="0.55"/>
+
+    <!-- تاتو روی سینه چپ -->
+    <path d="M 38 74 Q 42 78 40 84 M 42 74 Q 46 78 44 84" fill="none"
+      stroke="${tattooColor}" stroke-width="1.4" stroke-linecap="round"/>
+
+    <!-- ══════ بازوی چپ ══════ -->
+    <!-- بازو -->
+    <path d="M 32 68 Q 12 92 14 122" fill="none" stroke="${skin}" stroke-width="17" stroke-linecap="round"/>
+    <!-- سایه بازو -->
+    <path d="M 32 68 Q 12 92 14 122" fill="none" stroke="${skinShade}" stroke-width="17" stroke-linecap="round" opacity="0.12"/>
+    <!-- عضله دوسر (Bicep peak) -->
+    <path d="M 20 88 Q 26 82 30 90" fill="none" stroke="${skinLine}" stroke-width="1.6" opacity="0.6" stroke-linecap="round"/>
+    <ellipse cx="24" cy="92" rx="5" ry="7" fill="${skinLight}" opacity="0.3"/>
+    <!-- رگ بازو -->
+    <path d="M 22 96 Q 20 104 22 112" fill="none" stroke="${skinLine}" stroke-width="1" opacity="0.4"/>
+    <!-- تاتو بازو -->
+    <path d="M 16 106 L 20 104 L 18 110 Z" fill="${tattooColor}"/>
+    <path d="M 20 112 L 24 110" stroke="${tattooColor}" stroke-width="1.4" stroke-linecap="round"/>
+    <!-- نوار مچ -->
+    <rect x="10" y="118" width="12" height="5" rx="2" fill="${trim}" opacity="0.85"
+      transform="rotate(-8 16 120)"/>
+
+    <!-- دستکش چپ -->
+    <ellipse cx="14" cy="132" rx="15" ry="14" fill="${glove}" stroke="${gloveShade}" stroke-width="2.5"/>
+    <path d="M 4 128 Q 14 122 26 128" fill="none" stroke="${trim}" stroke-width="2.4" opacity="0.9" stroke-linecap="round"/>
+    <path d="M 6 136 Q 14 140 24 136" fill="none" stroke="${gloveShade}" stroke-width="1.2" opacity="0.5"/>
+    <ellipse cx="10" cy="127" rx="4" ry="3" fill="${outfitLight}" opacity="0.35"/>
+    <!-- بند دستکش -->
+    <path d="M 8 143 Q 14 147 20 143" fill="none" stroke="${trim}" stroke-width="1.6" opacity="0.8"/>
+    <!-- آرم روی دستکش -->
+    <circle cx="14" cy="132" r="4.5" fill="none" stroke="${trim}" stroke-width="1.3" opacity="0.85"/>
+    <text x="14" y="135" text-anchor="middle" font-size="6" font-weight="900"
+      fill="${trim}" font-family="monospace">${isBlack ? 'B' : 'W'}</text>
+
+    <!-- ══════ بازوی راست ══════ -->
+    <path d="M 98 68 Q 118 92 116 122" fill="none" stroke="${skin}" stroke-width="17" stroke-linecap="round"/>
+    <path d="M 98 68 Q 118 92 116 122" fill="none" stroke="${skinShade}" stroke-width="17" stroke-linecap="round" opacity="0.12"/>
+    <path d="M 110 88 Q 104 82 100 90" fill="none" stroke="${skinLine}" stroke-width="1.6" opacity="0.6" stroke-linecap="round"/>
+    <ellipse cx="106" cy="92" rx="5" ry="7" fill="${skinLight}" opacity="0.3"/>
+    <path d="M 108 96 Q 110 104 108 112" fill="none" stroke="${skinLine}" stroke-width="1" opacity="0.4"/>
+    <path d="M 114 106 L 110 104 L 112 110 Z" fill="${tattooColor}"/>
+    <path d="M 110 112 L 106 110" stroke="${tattooColor}" stroke-width="1.4" stroke-linecap="round"/>
+    <rect x="108" y="118" width="12" height="5" rx="2" fill="${trim}" opacity="0.85"
+      transform="rotate(8 114 120)"/>
+
+    <!-- دستکش راست -->
+    <ellipse cx="116" cy="132" rx="15" ry="14" fill="${glove}" stroke="${gloveShade}" stroke-width="2.5"/>
+    <path d="M 104 128 Q 116 122 128 128" fill="none" stroke="${trim}" stroke-width="2.4" opacity="0.9" stroke-linecap="round"/>
+    <path d="M 106 136 Q 116 140 126 136" fill="none" stroke="${gloveShade}" stroke-width="1.2" opacity="0.5"/>
+    <ellipse cx="120" cy="127" rx="4" ry="3" fill="${outfitLight}" opacity="0.35"/>
+    <path d="M 110 143 Q 116 147 122 143" fill="none" stroke="${trim}" stroke-width="1.6" opacity="0.8"/>
+    <circle cx="116" cy="132" r="4.5" fill="none" stroke="${trim}" stroke-width="1.3" opacity="0.85"/>
+    <text x="116" y="135" text-anchor="middle" font-size="6" font-weight="900"
+      fill="${trim}" font-family="monospace">${isBlack ? 'B' : 'W'}</text>
+
+    <!-- ══════ گردن ══════ -->
+    <path d="M 55 48 L 55 62 Q 65 68 75 62 L 75 48 Z"
+      fill="${skin}" stroke="${skinLine}" stroke-width="1.8"/>
+    <path d="M 58 54 Q 65 58 72 54" fill="none" stroke="${skinShade}" stroke-width="1.3" opacity="0.6"/>
+    <!-- عضله گردن -->
+    <path d="M 55 50 Q 60 56 62 62" fill="none" stroke="${skinLine}" stroke-width="1" opacity="0.4"/>
+    <path d="M 75 50 Q 70 56 68 62" fill="none" stroke="${skinLine}" stroke-width="1" opacity="0.4"/>
+
+    <!-- ══════ سر ══════ -->
+    <!-- گوش‌ها -->
+    <ellipse cx="34" cy="38" rx="5.5" ry="9" fill="${skin}" stroke="${skinLine}" stroke-width="1.5"/>
+    <ellipse cx="96" cy="38" rx="5.5" ry="9" fill="${skin}" stroke="${skinLine}" stroke-width="1.5"/>
+    <path d="M 33 36 Q 34 39 33 42" fill="none" stroke="${skinShade}" stroke-width="1" opacity="0.6"/>
+    <path d="M 97 36 Q 96 39 97 42" fill="none" stroke="${skinShade}" stroke-width="1" opacity="0.6"/>
+
+    <!-- فک و صورت -->
+    <path d="M 36 30 Q 33 52 48 62 Q 60 68 72 62 Q 87 52 84 30 Q 84 8 60 6 Q 36 8 36 30 Z"
+      fill="${skin}" stroke="${skinLine}" stroke-width="2.2" stroke-linejoin="round"/>
+    <!-- براقی صورت -->
+    <ellipse cx="50" cy="24" rx="12" ry="9" fill="${skinLight}" opacity="0.28"/>
+    <!-- خط فک -->
+    <path d="M 44 58 Q 55 62 66 58" fill="none" stroke="${skinShade}" stroke-width="1.2" opacity="0.45"/>
+
+    <!-- مو -->
+    ${hairShape(e.style, e.hair, 'rgba(255,255,255,0.25)')}
+
+    <!-- چشم‌ها -->
+    <ellipse cx="49" cy="36" rx="5.5" ry="5.8" fill="#ffffff"/>
+    <ellipse cx="71" cy="36" rx="5.5" ry="5.8" fill="#ffffff"/>
+    <circle cx="50" cy="37" r="3.1" fill="#1a1a24"/>
+    <circle cx="72" cy="37" r="3.1" fill="#1a1a24"/>
+    <circle cx="50.8" cy="35.8" r="1.1" fill="#ffffff"/>
+    <circle cx="72.8" cy="35.8" r="1.1" fill="#ffffff"/>
+    <!-- خط پلک -->
+    <path d="M 43 33 Q 49 30 55 33" fill="none" stroke="${skinLine}" stroke-width="1.4" opacity="0.7"/>
+    <path d="M 65 33 Q 71 30 77 33" fill="none" stroke="${skinLine}" stroke-width="1.4" opacity="0.7"/>
+
+    <!-- ابروهای مصمم -->
+    <path d="M 40 27 L 55 29.5" stroke="${e.hair}" stroke-width="3" stroke-linecap="round"/>
+    <path d="M 80 27 L 65 29.5" stroke="${e.hair}" stroke-width="3" stroke-linecap="round"/>
+
+    <!-- بینی -->
+    <path d="M 60 38 L 56 48 Q 60 50.5 64 48 Z" fill="${skinShade}" opacity="0.7"/>
+    <path d="M 60 38 L 58 46" stroke="${skinLine}" stroke-width="0.9" opacity="0.5" fill="none"/>
+    <ellipse cx="56.5" cy="48" rx="1.6" ry="1.1" fill="${skinLine}" opacity="0.5"/>
+    <ellipse cx="63.5" cy="48" rx="1.6" ry="1.1" fill="${skinLine}" opacity="0.5"/>
+
+    <!-- دهان -->
+    <path d="M 50 55 Q 60 60 70 55" fill="none" stroke="#7a2a1a" stroke-width="2.4" stroke-linecap="round"/>
+    <path d="M 52 55 Q 60 58 68 55" fill="none" stroke="${skinLight}" stroke-width="0.9" opacity="0.5"/>
+    <!-- محافظ دندان -->
+    <path d="M 53 56 Q 60 59 67 56" fill="none" stroke="${trim}" stroke-width="1.2" opacity="0.65"/>
+
+    <!-- چانه -->
+    <path d="M 56 63 Q 60 66 64 63" fill="none" stroke="${skinLine}" stroke-width="1" opacity="0.5"/>
+
+    <!-- عرق روی پیشانی -->
+    <ellipse cx="42" cy="22" rx="1.4" ry="2.2" fill="#a8d8ff" opacity="0.8"/>
+    <ellipse cx="78" cy="20" rx="1.2" ry="2" fill="#a8d8ff" opacity="0.7"/>
+    <ellipse cx="38" cy="50" rx="1" ry="1.6" fill="#a8d8ff" opacity="0.6"/>
+
+    <!-- ══════ نماد عنصر روی شکم ══════ -->
+    <text x="65" y="106" text-anchor="middle" font-size="19" font-weight="900"
+      fill="${textColor}" font-family="monospace" opacity="0.9"
+      style="paint-order:stroke;stroke:${isBlack ? '#000' : '#fff'};stroke-width:2px;stroke-linejoin:round">${key}</text>
+
+    <!-- هالهٔ نور پشت -->
+    <circle cx="65" cy="60" r="90" fill="url(#glow-${key}-${side})" opacity="0.5" style="pointer-events:none"/>
+  </svg>`;
+}
+
+/* ============================================================
+   وضعیت بازی
+   ============================================================ */
+let state = null;
+
+function newState(){
+  return {
+    playerPool: [...ORDER],
+    enemyQueue: shuffle([...ORDER]),
+    currentEnemy: null,
+    playerScore: 0,
+    enemyScore: 0,
+    busy: true,
+    over: false,
+  };
+}
+
+/* ============================================================
+   نیمکت‌ها
+   ============================================================ */
+function buildPlayerBench(){
+  const bench = $('playerBench');
+  bench.innerHTML = '';
+  ORDER.forEach(key => {
+    const e = ELEMENTS[key];
+    const btn = document.createElement('button');
+    btn.className = 'card';
+    btn.dataset.key = key;
+    btn.disabled = true;
+    btn.innerHTML = `
+      <div class="ball" style="--s:${ballSize(e.r)}px">${key}</div>
+      <div class="nm">${e.fa}</div>`;
+    btn.addEventListener('click', () => onSelect(key));
+    bench.appendChild(btn);
+  });
+}
+
+function refreshPlayerBench(){
+  document.querySelectorAll('#playerBench .card').forEach(btn => {
+    const key = btn.dataset.key;
+    const avail = state && state.playerPool.includes(key);
+    btn.classList.toggle('used', !avail);
+    btn.disabled = !avail || state.busy || !state.currentEnemy || state.over;
+  });
+}
+
+function renderEnemyBench(){
+  const bench = $('enemyBench');
+  bench.innerHTML = '';
+  const remaining = state ? state.enemyQueue.length : 7;
+  for (let i = 0; i < 7; i++){
+    const d = document.createElement('div');
+    d.className = 'card back' + (i < remaining ? '' : ' used');
+    d.textContent = '?';
+    bench.appendChild(d);
+  }
+}
+
+/* ============================================================
+   کمکی‌های رینگ
+   ============================================================ */
+function setStatus(text, cls = ''){
+  const s = $('status');
+  s.textContent = text;
+  s.className = 'status' + (cls ? ' ' + cls : '');
+}
+
+function shakeRing(){
+  const ring = $('ring');
+  ring.classList.remove('shake');
+  void ring.offsetWidth;
+  ring.classList.add('shake');
+}
+
+function flashEffect(){
+  const f = $('flash');
+  f.classList.remove('go');
+  void f.offsetWidth;
+  f.classList.add('go');
+}
+
+async function enter(slotId, key, side){
+  const slot = $(slotId);
+  slot.innerHTML = `<div class="fighter">${fighterSVG(key, side)}</div>`;
+  const f = slot.querySelector('.fighter');
+  const dir = side === 'player' ? -1 : 1;
+
+  f.style.transition = 'none';
+  f.style.transform = `translateX(${dir * 380}px) translateY(-40px) scale(0.88)`;
+  f.style.opacity = '0';
+
+  await raf();
+
+  f.style.transition = 'transform .62s cubic-bezier(.34,1.4,.64,1), opacity .4s';
+  f.style.transform = 'translateX(0) translateY(0) scale(1)';
+  f.style.opacity = '1';
+
+  await sleep(640);
+  return f;
+}
+
+function clearRing(){
+  $('playerSlot').innerHTML = '';
+  $('enemySlot').innerHTML = '';
+}
+
+/* ============================================================
+   انیمیشن نمایش مبارزه
+   ============================================================ */
+async function showdownAnimation(winnerIsPlayer){
+  const winnerSel = winnerIsPlayer ? '#playerSlot .fighter' : '#enemySlot .fighter';
+  const loserSel  = winnerIsPlayer ? '#enemySlot .fighter'  : '#playerSlot .fighter';
+  const winner = document.querySelector(winnerSel);
+  const loser  = document.querySelector(loserSel);
+
+  if (!winner || !loser) return;
+
+  const dir = winnerIsPlayer ? 1 : -1;
+  const backDir = -dir;
+
+  /* ۱) برنده جمع می‌شود و شارژ می‌کند */
+  winner.style.transition = 'transform .2s ease-out';
+  winner.style.transform = 'translateY(16px) scaleY(0.84) scaleX(1.16)';
+  await sleep(210);
+
+  /* ۲) پرش و ضربهٔ چرخشی پروازی */
+  winner.style.transition = 'transform .54s cubic-bezier(.4,.1,.6,1)';
+  winner.style.transform = `translateX(${dir * 118}px) translateY(-68px) rotate(${dir * 360}deg)`;
+  await sleep(500);
+
+  /* ۳) لحظهٔ برخورد */
+  shakeRing();
+  flashEffect();
+  await sleep(90);
+
+  /* ۴) پرتاب شدن بازنده به عقب */
+  loser.style.transition = 'transform .74s cubic-bezier(.3,0,.7,0), opacity .74s';
+  loser.style.transform = `translateX(${backDir * 220}px) translateY(-64px) rotate(${backDir * 480}deg)`;
+  await sleep(410);
+
+  /* ۵) سقوط بازنده روی زمین */
+  loser.style.transition = 'transform .56s cubic-bezier(.5,0,.8,0), opacity .56s';
+  loser.style.transform = `translateX(${backDir * 285}px) translateY(46px) rotate(${backDir * 750}deg)`;
+  loser.style.opacity = '0.18';
+  await sleep(540);
+
+  /* ۶) فرود قهرمان */
+  winner.style.transition = 'transform .52s cubic-bezier(.34,1.3,.64,1)';
+  winner.style.transform = `translateX(${dir * 58}px) translateY(0) rotate(${dir * 360}deg)`;
+  await sleep(540);
+}
+
+/* ============================================================
+   جریان بازی
+   ============================================================ */
+async function startGame(){
+  state = newState();
+  $('scorePlayer').textContent = '0';
+  $('scoreEnemy').textContent = '0';
+  clearRing();
+  $('overlay').classList.remove('show');
+  renderEnemyBench();
+  refreshPlayerBench();
+  setStatus('🥊 مبارزه آغاز شد!');
+  await sleep(500);
+  nextRound();
+}
+
+async function nextRound(){
+  if (!state || state.over) return;
+
+  if (state.enemyQueue.length === 0){
+    endGame();
+    return;
+  }
+
+  state.busy = true;
+  refreshPlayerBench();
+  state.currentEnemy = state.enemyQueue.shift();
+  renderEnemyBench();
+
+  setStatus('⏳ حریف در حال ورود به رینگ است...');
+  await enter('enemySlot', state.currentEnemy, 'enemy');
+  await sleep(230);
+
+  state.busy = false;
+  refreshPlayerBench();
+  const e = ELEMENTS[state.currentEnemy];
+  setStatus(`⚔️ حریف: ${state.currentEnemy} (${e.fa}) — اتم مناسب را انتخاب کن!`);
+}
+
+async function onSelect(key){
+  if (!state || state.busy || state.over || !state.currentEnemy) return;
+  if (!state.playerPool.includes(key)) return;
+
+  state.busy = true;
+  state.playerPool = state.playerPool.filter(k => k !== key);
+  refreshPlayerBench();
+
+  const enemyKey = state.currentEnemy;
+
+  setStatus(`🥊 مبارز ما وارد رینگ می‌شود: ${key} (${ELEMENTS[key].fa})`);
+  await enter('playerSlot', key, 'player');
+  await sleep(340);
+
+  const pp = POWER[key];
+  const ep = POWER[enemyKey];
+
+  if (pp > ep){
+    await showdownAnimation(true);
+    state.playerScore++;
+    $('scorePlayer').textContent = state.playerScore;
+    setStatus(`✅ آفرین! ${key} با واکنش‌پذیری بالاتر، ${enemyKey} را با ضربهٔ پروازی نقش زمین کرد!`, 'win');
+  } else if (ep > pp){
+    await showdownAnimation(false);
+    state.enemyScore++;
+    $('scoreEnemy').textContent = state.enemyScore;
+    setStatus(`❌ اشتباه بود! ${key} واکنش‌پذیری کمتری از ${enemyKey} داشت و زمین خورد!`, 'lose');
+  } else {
+    const pF = document.querySelector('#playerSlot .fighter');
+    const eF = document.querySelector('#enemySlot .fighter');
+    if (pF){
+      pF.style.transition = 'transform .6s cubic-bezier(.5,0,.8,0), opacity .6s';
+      pF.style.transform = 'translateX(-140px) translateY(38px) rotate(-75deg)';
+      pF.style.opacity = '.25';
+    }
+    if (eF){
+      eF.style.transition = 'transform .6s cubic-bezier(.5,0,.8,0), opacity .6s';
+      eF.style.transform = 'translateX(140px) translateY(38px) rotate(75deg)';
+      eF.style.opacity = '.25';
+    }
+    shakeRing();
+    flashEffect();
+    setStatus(`🤝 هر دو ${key} بودند؛ مبارزه مساوی شد!`, 'draw');
+    await sleep(1400);
+  }
+
+  await sleep(1650);
+  clearRing();
+  state.currentEnemy = null;
+  await sleep(400);
+
+  if (state.enemyQueue.length === 0){
+    endGame();
+  } else {
+    nextRound();
+  }
+}
+
+function endGame(){
+  state.over = true;
+  state.busy = true;
+  refreshPlayerBench();
+  renderEnemyBench();
+
+  const p = state.playerScore;
+  const e = state.enemyScore;
+
+  let emoji, title, msg;
+  if (p > e){
+    emoji = '🏆'; title = 'قهرمان شدی!';
+    msg = 'تیم لباس سفید با شناخت درست واکنش‌پذیری، حریف را شکست داد.';
+  } else if (e > p){
+    emoji = '💀'; title = 'باختی!';
+    msg = 'تیم لباس مشکی برنده شد. ترتیب واکنش‌پذیری را دوباره مرور کن و برگرد.';
+  } else {
+    emoji = '🤝'; title = 'مساوی!';
+    msg = 'مبارزه برابر شد. یک بار دیگر امتحان کن تا قهرمان شوی.';
+  }
+
+  $('overlay').querySelector('.modal').innerHTML = `
+    <div class="big">${emoji}</div>
+    <h1>${title}</h1>
+    <p class="center">${msg}</p>
+    <div class="final-score">
+      <div><span>ما (لباس سفید)</span><b>${p}</b></div>
+      <div><span>حریف (لباس مشکی)</span><b>${e}</b></div>
+    </div>
+    <div class="creator-line">ساخته شده توسط <b>مهندس رحمانی</b></div>
+    <button id="againBtn">مبارزهٔ مجدد</button>
+  `;
+  $('overlay').classList.add('show');
+  $('againBtn').addEventListener('click', startGame);
+
+  setStatus(`پایان مبارزه — نتیجه: ما ${p} / حریف ${e}`, p > e ? 'win' : (e > p ? 'lose' : 'draw'));
+}
+
+/* ============================================================
+   راه‌اندازی
+   ============================================================ */
+buildPlayerBench();
+renderEnemyBench();
+
+$('startBtn').addEventListener('click', startGame);
+
+$('hintBtn').addEventListener('click', () => {
+  $('hintBody').classList.toggle('open');
+});
+</script>
+</body>
+</html>
